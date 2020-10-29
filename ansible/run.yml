@@ -1,0 +1,19 @@
+- name: call apis
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - vars/tower_secrets.yml
+
+  tasks:
+
+    - name: launch tower job
+      awx.awx.tower_job_launch:
+        tower_host: "{{ tower_host }}"
+        tower_oauthtoken: "{{ tower_oauthtoken }}"
+        job_template: benchmark
+      loop: "{{ range(0, 200) | list }}"
+      register: job_launch
+      retries: 5
+      delay: 1
+      until: job_launch is not failed

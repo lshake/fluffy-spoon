@@ -1,0 +1,40 @@
+---
+- name: call apis
+  hosts: localhost
+  gather_facts: false
+  vars:
+    api_submit: http://wsfed31.lab.shakey.org:5000//api/v1/jobs/submit
+    api_query: http://wsfed31.lab.shakey.org:5000/api/v1/jobs/query
+    retry_count: 100
+    retry_interval: 15
+    timeout: 5
+    job_type: long
+
+  tasks:
+    - name: submit a job
+      uri:
+        url: "{{ api_submit }}_{{ job_type }}"
+        headers:
+          Content-Type: "application/json"
+        timeout: "{{ timeout }}"
+        method: POST
+        status_code: 200
+      register: job_info
+
+    - debug:
+        var: job_info.json.id
+
+    - name: wait for job to finish
+      uri:
+        url: "{{ api_query }}?id={{ job_info.json.id }}"
+        headers:
+          Content-Type: "application/json"
+        validate_certs: false
+        timeout: "{{ timeout }}"
+      register: job_status
+      until: job_status.json.status == "finished"
+      retries: "{{ retry_count }}"
+      delay: "{{ retry_interval }}"
+
+    - debug:
+        var: job_status.json.status

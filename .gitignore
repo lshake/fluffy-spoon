@@ -1,0 +1,36 @@
+# Compiled Python files
+*.pyc
+
+# Ansible retry files
+*.retry
+
+# Folder view configuration files
+.DS_Store
+Desktop.ini
+
+# Thumbnail cache files
+._*
+Thumbs.db
+
+# Files that might appear on external disks
+.Spotlight-V100
+.Trashes
+
+# Archives
+*.tar.gz
+*.tgz
+*.zip
+
+# # Roles should be pulled from galaxy
+ansible/roles/*
+ansible/collections/*
+# Except for requirements files
+!roles/requirements*.yml
+!collections/requirements*.yml
+
+# VSCode workspace files
+*.code-workspace
+
+*.db
+*/venv
+
