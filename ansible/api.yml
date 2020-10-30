@@ -1,6 +1,6 @@
 ---
 - name: call apis
-  connection: local
+  hosts: localhost
   gather_facts: false
   vars:
     api_submit: http://wsfed31.lab.shakey.org:5000//api/v1/jobs/submit

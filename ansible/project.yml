@@ -4,9 +4,16 @@
 
   vars:
     api_server_host: efkclient.lab.shakey.org
+    tower_ssh_user: lshakesp
+    tower_ssh_private_key: "{{ lookup('file', '~/.ssh/id_rsa') }}"
     api_server_variables:
       api_submit: http://{{ api_server_host }}:5000/api/v1/jobs/submit
       api_query: http://{{ api_server_host }}:5000/api/v1/jobs/query
+
+  vars_prompt:
+    - name: tower_ssh_key_unlock
+      prompt: Enter ssh private key passphrase
+      private: yes
 
   tasks:
     - name: create the org
@@ -36,6 +43,16 @@
         inventory: "benchmark_inventory"
         state: present
 
+    - name: create a credential
+      awx.awx.tower_credential:
+        name: benchmark_credential
+        credential_type: Machine
+        organization: Default
+        inputs:
+          username: "{{ tower_ssh_user }}"
+          ssh_key_data: "{{ lookup('file', '~/.ssh/id_rsa') }}"
+          ssh_key_unlock: "{{ tower_ssh_key_unlock }}"
+
     - name: create template
       awx.awx.tower_job_template:
         name: "run_api"
@@ -43,6 +60,9 @@
         inventory: "benchmark_inventory"
         project: "benchmark_project"
         playbook: "ansible/api.yml"
+        credentials:
+          - benchmark_credential
         state: "present"
         extra_vars: "{{ api_server_variables }}"
         allow_simultaneous: True
+
