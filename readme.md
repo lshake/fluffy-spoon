@@ -17,7 +17,7 @@ flask run --host=0.0.0.0
 ```
 
 ### To create the project and resources
-Ensure that your private key is stored as ~/.ssh/id_rsa, or set the playbook variable "tower_ssh_
+Ensure that your private key is stored as ~/.ssh/id_rsa edit the lookup in the playbook.
 
 ```
 cd tower_benchmark/ansible
@@ -37,7 +37,7 @@ ansible-galaxy collection install awx.awx
 export TOWER_PASSWORD=xxxxx
 export TOWER_USERNAME=admin
 export TOWER_HOST=tower.example.com
-ansible-playbook ./run.yml -i "[localhost,]"
+ansible-playbook ./run.yml -i "[localhost,]" --extra-vars="{'tower_host': 'tower.example.com'}"
 ```
 
 
