@@ -1,0 +1,48 @@
+- name: call apis
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    api_server_host: efkclient.lab.shakey.org
+    api_server_variables:
+      api_submit: http://{{ api_server_host }}:5000/api/v1/jobs/submit
+      api_query: http://{{ api_server_host }}:5000/api/v1/jobs/query
+
+  tasks:
+    - name: create the org
+      awx.awx.tower_organization:
+        name: "benchmark"
+        description: "Tower Benchmark App"
+        state: present
+
+    - name: create the project
+      awx.awx.tower_project:
+        name: "benchmark_project"
+        organization: "benchmark"
+        scm_url: "https://github.com/lshake/fluffy-spoon.git"
+        scm_type: git
+        scm_branch: "main"
+        state: present
+
+    - name: create an inventory
+      awx.awx.tower_inventory:
+        name: "benchmark_inventory"
+        organization: "benchmark"
+        state: present
+
+    - name: add localhost to inventory
+      awx.awx.tower_host:
+        name: localhost
+        inventory: "benchmark_inventory"
+        state: present
+
+    - name: create template
+      awx.awx.tower_job_template:
+        name: "run_api"
+        job_type: "run"
+        inventory: "benchmark_inventory"
+        project: "benchmark_project"
+        playbook: "ansible/api.yml"
+        state: "present"
+        extra_vars: "{{ api_server_variables }}"
+        allow_simultaneous: True

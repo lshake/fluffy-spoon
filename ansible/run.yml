@@ -2,15 +2,13 @@
   hosts: localhost
   gather_facts: false
 
-  vars_files:
-    - vars/tower_secrets.yml
+  vars:
+    tower_host: towerclst01a.lab.shakey.org
 
   tasks:
-
     - name: launch tower job
       awx.awx.tower_job_launch:
         tower_host: "{{ tower_host }}"
-        tower_oauthtoken: "{{ tower_oauthtoken }}"
         job_template: benchmark
       loop: "{{ range(0, 200) | list }}"
       register: job_launch
